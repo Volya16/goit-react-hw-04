@@ -49,8 +49,6 @@ export default function App() {
         setError(false);
         setLoading(true);
         const data = await fetchImges(searchTerm, page);
-        console.log(data.total_pages);
-        console.log(page);
         setImages((prevImages) => {
           return [...prevImages, ...data.results];
         });
