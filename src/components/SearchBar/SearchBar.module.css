@@ -3,6 +3,7 @@ header {
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,6 +41,7 @@ header {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s;
+  border-color: inherit;
 }
 
 .searchutton:hover {

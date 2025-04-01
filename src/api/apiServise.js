@@ -14,5 +14,5 @@ export default async function fetchImges(newImages, currentPage) {
     },
   });
 
-  return response.data.results;
+  return response.data;
 }

@@ -1,4 +1,4 @@
-export default function ErrorMessage({ error }) {
+export default function ErrorMessage() {
   return (
     <>
       <b>

@@ -1,6 +1,3 @@
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "/vite.svg";
-
 import { useEffect, useState } from "react";
 
 import fetchImges from "../../api/apiServise";
@@ -9,6 +6,8 @@ import SearchBar from "../SearchBar/SearchBar";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import LoadMoreBtn from "../LoaderMoreBtn/LoaderMoreBtn";
+import ImageModal from "../ImageModal/ImageModal";
 
 export default function App() {
   const [images, setImages] = useState([]);
@@ -16,8 +15,11 @@ export default function App() {
   const [error, setError] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const [currentImg, setCurrentImg] = useState(null);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleSearch = async (value) => {
+    setLoading(true);
     setSearchTerm(value);
     setPage(1);
     setImages([]);
@@ -27,6 +29,16 @@ export default function App() {
     setPage((page) => page + 1);
   };
 
+  const handleOpenModal = (img) => {
+    console.log("Відкриваємо модальне вікно...");
+    setCurrentImg(img);
+  };
+
+  const handleCloseModal = () => {
+    console.log("Закриваємо модальне вікно...");
+    setCurrentImg(null);
+  };
+
   useEffect(() => {
     if (searchTerm === "") {
       return;
@@ -34,13 +46,22 @@ export default function App() {
 
     async function getData() {
       try {
+        setError(false);
+        setLoading(true);
         const data = await fetchImges(searchTerm, page);
+        console.log(data.total_pages);
+        console.log(page);
         setImages((prevImages) => {
-          return [...prevImages, ...data];
+          return [...prevImages, ...data.results];
         });
+        if (data.total_pages && data.total_pages !== totalPages) {
+          setTotalPages(data.total_pages);
+        }
       } catch (error) {
-        // setError(true);
+        setImages([]);
+        setError(true);
       } finally {
+        setLoading(false);
       }
     }
     getData();
@@ -49,23 +70,15 @@ export default function App() {
   return (
     <>
       <SearchBar onSubmit={handleSearch} />
+      {error && <ErrorMessage />}
       {images.length > 0 && (
-        <ImageGallery images={images} page={page} onClick={handlecLoadMore} />
+        <ImageGallery images={images} page={page} onClick={handleOpenModal} />
       )}
       <Loader loading={loading} />
-      {error && <ErrorMessage error={error} />}
+      {images.length > 0 && !loading && page !== totalPages && (
+        <LoadMoreBtn onClick={handlecLoadMore} page={page} />
+      )}
+      {currentImg && <ImageModal img={currentImg} onClose={handleCloseModal} />}
     </>
   );
 }
-
-// try {
-//   setError(false);
-//   setLoading(true);
-//   const data = await fetchImges(value);
-//   setImages(data);
-// } catch {
-//   setImages([]);
-//   setError(true);
-// } finally {
-//   setLoading(false);
-// }
